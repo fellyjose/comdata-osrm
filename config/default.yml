@@ -1,0 +1,6 @@
+# Default config
+server:
+  port: 8888
+
+# the local prepared OSRM file
+osrm_file: './data/longmont.osrm'

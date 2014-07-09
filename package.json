@@ -1,0 +1,32 @@
+{
+  "name": "osrm-server",
+  "version": "0.1.0",
+  "description": "routing engine ",
+  "main": "app.js",
+  "author": {
+    "name": "Norman Barker"
+  },
+  "dependencies": {
+    "config": "^0.4.36",
+    "express": "^4.5.1",
+    "osrm": "^0.11.2",
+    "yaml": "^0.2.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Cloudant/osrm-server.git"
+  },
+  "readmeFilename": "README.md",
+  "bugs": {
+    "url": "https://github.com/Clojudant/osrm-server/issues"
+  },
+  "scripts": {
+    "start": "node app.js",
+    "test": "mocha -R spec"
+  },
+  "devDependencies": {
+    "mocha": "^1.20.1",
+    "should": "^4.0.4",
+    "supertest": "^0.13.0"
+  }
+}
