@@ -9,7 +9,7 @@ describe('Route via waypoints', function () {
   describe('route between points in lat/lon', function() {
     it('should return 2 results', function (done) {
       request(app)
-        .get('/viaroute?loc=-105.1092,40.1717&loc=-105.12,40.19')
+        .get('/viaroute?loc=40.1717,-105.1092&loc=40.19,-105.12')
         .expect(200)
         .end(function (err, res) {
           should.not.exist(err);
