@@ -3,5 +3,5 @@ server:
   port: 8888
 
 # the local prepared OSRM file
-# osrm_file: './data/north-america-latest.osrm'
-osrm_file: './data/longmont/longmont.osrm'
+osrm_file: './data/north-america-latest.osrm'
+# osrm_file: './data/longmont/longmont.osrm'
