@@ -9,7 +9,7 @@
   "dependencies": {
     "config": "^0.4.36",
     "express": "^4.5.1",
-    "osrm": "^0.11.2",
+    "osrm": "^4.4.0-final",
     "yaml": "^0.2.3"
   },
   "repository": {
