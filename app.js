@@ -31,7 +31,7 @@ app.get('/table', function (req, res) {
     }
 
     // either network distance (time) or kilometres
-    if ((req.query.format) && (req.query.format.toLowerCase() === 'kms')) {
+    if ((req.query.format) && (req.query.format.toLowerCase() === 'meters')) {
       // create a matrix of results - max is 100 configured in OSRM
       // call viaroute and retrieve total_distance
       var perms = node_permutations(coords);
