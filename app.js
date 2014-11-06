@@ -1,6 +1,6 @@
 var express = require('express'),
   OSRM = require('osrm'),
-  config = require("config");
+  config = require('config');
 
 global['config'] = config;
 
@@ -36,42 +36,58 @@ app.get('/table', function (req, res) {
       // call viaroute and retrieve total_distance
       var perms = node_permutations(coords);
 
-      // osrm.route doesn't like to be called asynchronously
-      var dists = [];
+      var queries = [];
       for (var i = 0; i < perms.length; i++){
-        var query =
-        {
-          coordinates: perms[i],
-          printInstructions: false,
-          alternateRoute: false
+        for (var j = 0; j < perms[i].length; j++) {
+          var query =
+          {
+            coordinates: perms[i][j],
+            printInstructions: false,
+            alternateRoute: false
+          };
+          queries.push(query);
         }
-        osrm.route(query, function(err, row) {
+      }
+
+      var tmp = [];
+      for (var i = 0; i < queries.length; i++) {
+        route(i, queries[i], function(err, result) {
           if (err)
             res.status(500).jsonp(err);
           else {
-            dists.push(row.route_summary.total_distance);
-            if (dists.length == perms.length) {
-              // slice data to add diagonal of zeros
+            tmp.push(result);
+
+            if (tmp.length === queries.length) {
               var table = {
                 "distance_table": []
               };
 
+              tmp = tmp.sort(function(x, y) {
+                if (x.index < y.index)
+                  return -1;
+                if (x.index > y.index)
+                  return 1;
 
-              var split = coords.length - 1;
-              var cntr = 0;
-              for (var i = 0; i < dists.length; i+= split) {
-                var tmp = dists.slice(i, i + split);
-                // add the diagonal zero
-                tmp.splice(cntr, 0, 0);
-                table.distance_table.push(tmp);
-                ++cntr;
+                return 0;
+              });
+
+              var cntr = perms.length;
+
+              for (var i = 0; i < tmp.length; i += cntr) {
+                table.distance_table.push(tmp.slice(i, i + cntr).map(
+                  function(x) {
+                    return x.dist;
+                  }
+                ));
               }
 
               res.status(200).jsonp(table);
             }
           }
-        })
+        });
+
       }
+
     } else {
       // osrm distance table
       var query = {
@@ -158,35 +174,36 @@ app.get('/locate', function (req, res) {
   }
 });
 
+function route(i, query, callback) {
+  osrm.route(query, function(err, res) {
+    if ((err) || (!res.route_summary))
+      callback(err);
+    else
+      callback(null, {
+        "index" : i,
+        "dist" : res.route_summary.total_distance
+      });
+  });
+}
+
 function node_permutations(list)
 {
-	// Empty list has one permutation
-	if (list.length == 0)
-		return [[]];
+  // Empty list has one permutation
+  if (list.length == 0)
+    return [[]];
 
+  var cntr = 0;
+  var result = [];
 
-	var result = [];
-
-	for (var i=0; i < list.length; i++)
-	{
-		// Clone list (kind of)
-		var copy = Object.create(list);
-
-		// Cut one element from list
-		var head = copy.splice(i, 1);
-
-		// Permute rest of list
-		var rest = node_permutations(copy);
-
-    // Add head to each permutation of rest of list
-		for (var j=0; j < rest.length; j++)
-		{
-			var next = head.concat(rest[j]);
-			result.push([next[0], next[1]]);
-		}
-	}
-
-	return result;
+  do {
+    var tmp = [];
+    var val = list[cntr];
+    for (var i = 0; i < list.length; i++) {
+      tmp.push([val, list[i]]);
+    }
+    result.push(tmp);
+  } while (++cntr < list.length);
+  return result;
 }
 
 console.log('Listening on port: ' + config.server.port);
